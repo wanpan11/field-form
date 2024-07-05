@@ -165,6 +165,8 @@ class Field extends React.Component<InternalFieldProps, FieldState> implements F
 
     this.mounted = true;
 
+    console.log('[ componentDidMount ] ===>');
+
     // Register on init
     if (fieldContext) {
       const { getInternalHooks }: InternalFormInstance = fieldContext;
@@ -179,6 +181,8 @@ class Field extends React.Component<InternalFieldProps, FieldState> implements F
   }
 
   public componentWillUnmount() {
+    console.log('[ componentWillUnmount ] ===>');
+
     this.cancelRegister();
     this.triggerMetaEvent(true);
     this.mounted = false;

@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
 
-import React from 'react';
+import React, { StrictMode } from 'react';
 import Form from 'rc-field-form';
 import Input from './components/Input';
-import LabelField from './components/LabelField';
 
 const { List, useForm } = Form;
 
@@ -15,85 +14,67 @@ const Demo = () => {
       <h3>List of Form</h3>
       <p>You can set Field as List</p>
 
-      <Form
-        form={form}
-        onValuesChange={(_, values) => {
-          console.log('values:', values);
-        }}
-        style={{ border: '1px solid red', padding: 15 }}
-        preserve={false}
-        // initialValues={{
-        //   users: ['little'],
-        // }}
-      >
-        <Form.Field shouldUpdate>{() => JSON.stringify(form.getFieldsValue(), null, 2)}</Form.Field>
+      <StrictMode>
+        <Form form={form} preserve={false} style={{ border: '1px solid red', padding: 15 }}>
+          <Form.Field shouldUpdate>
+            {() => JSON.stringify(form.getFieldsValue(), null, 2)}
+          </Form.Field>
 
-        <List
-          name="users"
-          initialValue={['bamboo', 'light']}
-          rules={[
-            {
-              message: 'Must have at least 2 user!',
-              validator: async (_, value) => {
-                if (value.length < 2) {
-                  throw new Error();
-                }
-              },
-            },
-          ]}
-        >
-          {(fields, { add, remove }, { errors }) => {
-            console.log('Demo Fields:', fields);
-            return (
-              <div>
-                <h4>List of `users`</h4>
-                {fields.map((field, index) => (
-                  <LabelField {...field} rules={[{ required: true }]}>
-                    {control => (
-                      <div style={{ position: 'relative' }}>
-                        <Input {...control} />
-                        <a
-                          style={{ position: 'absolute', top: 12, right: -300 }}
+          <List name="users">
+            {(fields, { add, remove }) => {
+              return (
+                <div>
+                  <h4>List of `users`</h4>
+
+                  {fields.map(({ key, name, ...restField }) => {
+                    return (
+                      <div
+                        key={key}
+                        style={{ marginBottom: 12, display: 'flex', alignItems: 'center' }}
+                      >
+                        <Form.Field
+                          {...restField}
+                          name={[name, 'first']}
+                          rules={[{ required: true, message: 'Missing first name' }]}
+                        >
+                          <Input placeholder="First Name" />
+                        </Form.Field>
+
+                        <button
+                          style={{ height: 24 }}
                           onClick={() => {
-                            remove(index);
+                            remove(name);
                           }}
                         >
-                          Remove
-                        </a>
+                          -
+                        </button>
                       </div>
-                    )}
-                  </LabelField>
-                ))}
+                    );
+                  })}
 
-                <ul>
-                  {errors.map(err => (
-                    <li key={err}>{err}</li>
-                  ))}
-                </ul>
+                  <button
+                    onClick={() => {
+                      add({ first: 'first' });
+                    }}
+                  >
+                    + New User
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    add();
-                  }}
-                >
-                  + New User
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    remove(1);
-                  }}
-                >
-                  Remove index: 1
-                </button>
-              </div>
-            );
-          }}
-        </List>
-      </Form>
+                  <button
+                    onClick={() => {
+                      form.resetFields();
+                    }}
+                  >
+                    resetFields
+                  </button>
+                </div>
+              );
+            }}
+          </List>
+        </Form>
+      </StrictMode>
 
-      <div style={{ border: '1px solid #000', padding: 15 }}>
+      {/* <div style={{ border: '1px solid #000', padding: 15 }}>
         <h4>Out Of Form</h4>
         <button
           type="button"
@@ -114,7 +95,7 @@ const Demo = () => {
         >
           Is List touched
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

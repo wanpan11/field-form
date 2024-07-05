@@ -1,7 +1,7 @@
 import * as React from 'react';
 import warning from 'rc-util/lib/warning';
 import type { InternalNamePath, NamePath, StoreValue, ValidatorRule, Meta } from './interface';
-import FieldContext from './FieldContext';
+import FieldContext, { HOOK_MARK } from './FieldContext';
 import Field from './Field';
 import { move, getNamePath } from './utils/valueUtil';
 import type { ListContextProps } from './ListContext';
@@ -95,7 +95,8 @@ function List<Values = any>({
           isListField={isListField ?? !!wrapperListContext}
         >
           {({ value = [], onChange }, meta) => {
-            const { getFieldValue } = context;
+            const { getFieldValue, getInternalHooks } = context;
+            const { setInitialValues } = getInternalHooks(HOOK_MARK);
             const getNewValue = () => {
               const values = getFieldValue(prefixName || []) as StoreValue[];
               return values || [];
@@ -127,6 +128,7 @@ function List<Values = any>({
                   }
                   keyManager.keys = [...keyManager.keys, keyManager.id];
                   onChange([...newValue, defaultValue]);
+                  setInitialValues({ [name]: [...newValue, defaultValue] }, false);
                 }
                 keyManager.id += 1;
               },
@@ -142,7 +144,9 @@ function List<Values = any>({
                 );
 
                 // Trigger store change
-                onChange(newValue.filter((_, valueIndex) => !indexSet.has(valueIndex)));
+                const nextData = newValue.filter((_, valueIndex) => !indexSet.has(valueIndex));
+                onChange(nextData);
+                setInitialValues({ [name]: [...nextData] }, false);
               },
               move(from: number, to: number) {
                 if (from === to) {
@@ -158,7 +162,9 @@ function List<Values = any>({
                 keyManager.keys = move(keyManager.keys, from, to);
 
                 // Trigger store change
-                onChange(move(newValue, from, to));
+                const nextData = move(newValue, from, to);
+                onChange(nextData);
+                setInitialValues({ [name]: [...nextData] }, false);
               },
             };
 

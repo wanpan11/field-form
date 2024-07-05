@@ -660,7 +660,7 @@ export class FormStore {
 
       // Clean up store value if not preserve
       if (!this.isMergedPreserve(preserve) && (!isListField || subNamePath.length > 1)) {
-        const defaultValue = isListField ? undefined : this.getInitialValue(namePath);
+        const defaultValue = this.getInitialValue(namePath);
 
         if (
           namePath.length &&
